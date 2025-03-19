@@ -1,0 +1,32 @@
+{
+  "name": "boilerplate-shared-libraries-database-user-service",
+  "version": "1.0.0",
+  "description": "Boilerplate shared libraries database user service",
+  "main": "index.js",
+  "scripts": {
+    "build": "rm -rf dist && tsc",
+    "start": "node dist/index.js",
+    "dev": "tsc --watch",
+    "db-migrate": "prisma migrate dev --skip-seed --name migration",
+    "db-migrate-reset": "prisma migrate reset --skip-seed",
+    "db-seed": "prisma db seed",
+    "prisma": "prisma",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Christian Murillo",
+  "license": "ISC",
+  "prisma": {
+    "seed": "ts-node prisma/seeders"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.10",
+    "@types/uuid": "^10.0.0",
+    "prisma": "^6.5.0",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.5.0",
+    "uuid": "^11.1.0"
+  }
+}

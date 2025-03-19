@@ -1,0 +1,109 @@
+version: "3.9"
+
+services:
+  # Application Service
+  auth_app:
+    container_name: boilerplate_auth_library_service
+    image: node:20.13
+    command: /bin/sh -c "npm install && npm run dev"
+    environment:
+      DATABASE_URL: mysql://root:password@host.docker.internal:3401/boilerplate_auth_live
+    ports:
+      - "5401:3000"
+    depends_on:
+      - auth_database
+    working_dir: /var/app/current
+    volumes:
+      - "./auth-service:/var/app/current"
+    networks:
+      - boilerplate_microservices_network
+
+  user_app:
+    container_name: boilerplate_user_library_service
+    image: node:20.13
+    command: /bin/sh -c "npm install && npm run dev"
+    environment:
+      DATABASE_URL: mysql://root:password@host.docker.internal:3402/boilerplate_user_live
+    ports:
+      - "5402:3000"
+    depends_on:
+      - user_database
+    working_dir: /var/app/current
+    volumes:
+      - "./user-service:/var/app/current"
+    networks:
+      - boilerplate_microservices_network
+
+  # Database Service
+  auth_database:
+    container_name: boilerplate_auth_database
+    image: mysql:8.0.32
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: boilerplate_auth_live
+    ports:
+      - "3401:3306"
+    volumes:
+      - "auth_local_mysql_data:/var/lib/mysql"
+    networks:
+      - boilerplate_microservices_network
+
+  user_database:
+    container_name: boilerplate_user_database
+    image: mysql:8.0.32
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: boilerplate_user_live
+    ports:
+      - "3402:3306"
+    volumes:
+      - "user_local_mysql_data:/var/lib/mysql"
+    networks:
+      - boilerplate_microservices_network
+
+  # Kafka Service
+  boilerplate_zookeeper:
+    container_name: boilerplate_zookeeper
+    image: wurstmeister/zookeeper:3.4.6
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2182
+    ports:
+      - "2182:2181"
+    volumes:
+      - local_zookeeper_data:/var/lib/zookeeper
+    networks:
+      - boilerplate_microservices_network
+
+  boilerplate_kafka:
+    container_name: boilerplate_kafka
+    image: wurstmeister/kafka:2.12-2.2.1
+    environment:
+      KAFKA_LISTENERS: boilerplate://0.0.0.0:9094
+      KAFKA_ADVERTISED_LISTENERS: boilerplate://boilerplate_kafka:9094
+      KAFKA_LISTENER_SECURITY_PROTOCOL: PLAINTEXT
+      KAFKA_LISTENER_NAME_INTERNAL: boilerplate
+      KAFKA_LISTENER_INTERNAL: boilerplate://boilerplate_kafka:9094
+      KAFKA_LISTENER_INTERNAL_PORT: 9094
+      KAFKA_LISTENER_PORT: 9094
+      KAFKA_ZOOKEEPER_CONNECT: boilerplate_zookeeper:2182
+      KAFKA_ADVERTISED_LISTENER: boilerplate://boilerplate_kafka:9094
+    ports:
+      - "9094:9093"
+    depends_on:
+      - boilerplate_zookeeper
+    volumes:
+      - local_kafka_data:/var/lib/kafka/data
+    networks:
+      - boilerplate_microservices_network
+
+networks:
+  boilerplate_microservices_network:
+    driver: bridge
+
+volumes:
+  auth_local_mysql_data:
+  user_local_mysql_data:
+  local_zookeeper_data:
+  local_kafka_data:
