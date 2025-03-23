@@ -2,8 +2,8 @@ version: "3.9"
 
 services:
   # Application Service
-  auth_app:
-    container_name: boilerplate_auth_library_service
+  boilerplate_auth_app:
+    container_name: boilerplate_auth_app
     image: node:20.13
     command: /bin/sh -c "npm install && npm run dev"
     environment:
@@ -11,15 +11,15 @@ services:
     ports:
       - "5401:3000"
     depends_on:
-      - auth_database
+      - boilerplate_auth_database
     working_dir: /var/app/current
     volumes:
       - "./auth-service:/var/app/current"
     networks:
       - boilerplate_microservices_network
 
-  user_app:
-    container_name: boilerplate_user_library_service
+  boilerplate_user_app:
+    container_name: boilerplate_user_app
     image: node:20.13
     command: /bin/sh -c "npm install && npm run dev"
     environment:
@@ -27,7 +27,7 @@ services:
     ports:
       - "5402:3000"
     depends_on:
-      - user_database
+      - boilerplate_user_database
     working_dir: /var/app/current
     volumes:
       - "./user-service:/var/app/current"
@@ -35,7 +35,7 @@ services:
       - boilerplate_microservices_network
 
   # Database Service
-  auth_database:
+  boilerplate_auth_database:
     container_name: boilerplate_auth_database
     image: mysql:8.0.32
     restart: always
@@ -49,7 +49,7 @@ services:
     networks:
       - boilerplate_microservices_network
 
-  user_database:
+  boilerplate_user_database:
     container_name: boilerplate_user_database
     image: mysql:8.0.32
     restart: always
@@ -66,33 +66,50 @@ services:
   # Kafka Service
   boilerplate_zookeeper:
     container_name: boilerplate_zookeeper
-    image: wurstmeister/zookeeper:3.4.6
+    image: confluentinc/cp-zookeeper:7.6.5
     environment:
-      ZOOKEEPER_CLIENT_PORT: 2182
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
     ports:
-      - "2182:2181"
+      - "2181:2181"
     volumes:
       - local_zookeeper_data:/var/lib/zookeeper
     networks:
       - boilerplate_microservices_network
 
-  boilerplate_kafka:
-    container_name: boilerplate_kafka
-    image: wurstmeister/kafka:2.12-2.2.1
+  boilerplate_schema_registry:
+    container_name: boilerplate_schema_registry
+    image: confluentinc/cp-schema-registry:7.6.5
+    depends_on:
+      - boilerplate_kafka_broker
     environment:
-      KAFKA_LISTENERS: boilerplate://0.0.0.0:9094
-      KAFKA_ADVERTISED_LISTENERS: boilerplate://boilerplate_kafka:9094
-      KAFKA_LISTENER_SECURITY_PROTOCOL: PLAINTEXT
-      KAFKA_LISTENER_NAME_INTERNAL: boilerplate
-      KAFKA_LISTENER_INTERNAL: boilerplate://boilerplate_kafka:9094
-      KAFKA_LISTENER_INTERNAL_PORT: 9094
-      KAFKA_LISTENER_PORT: 9094
-      KAFKA_ZOOKEEPER_CONNECT: boilerplate_zookeeper:2182
-      KAFKA_ADVERTISED_LISTENER: boilerplate://boilerplate_kafka:9094
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: 'boilerplate_zookeeper:2181'
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://boilerplate_kafka_broker:9092,PLAINTEXT_INTERNAL://host.docker.internal:19092
+      SCHEMA_REGISTRY_DEBUG: 'true'
     ports:
-      - "9094:9093"
+      - "8081:8081"
+    volumes:
+      - local_schema_registry_data:/tmp/schema-registry
+    networks:
+      - boilerplate_microservices_network
+
+  boilerplate_kafka_broker:
+    container_name: boilerplate_kafka_broker
+    image: confluentinc/cp-kafka:7.6.5
     depends_on:
       - boilerplate_zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'boilerplate_zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_INTERNAL://0.0.0.0:19092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://boilerplate_kafka_broker:9092,PLAINTEXT_INTERNAL://host.docker.internal:19092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    ports:
+      - "9092:9092"
+      - "19092:19092"
     volumes:
       - local_kafka_data:/var/lib/kafka/data
     networks:
@@ -106,4 +123,5 @@ volumes:
   auth_local_mysql_data:
   user_local_mysql_data:
   local_zookeeper_data:
+  local_schema_registry_data:
   local_kafka_data:
