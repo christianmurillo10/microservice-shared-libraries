@@ -1,1 +1,0 @@
-console.info("Auth service database is running.");

@@ -1,1 +1,0 @@
-console.info("User service database is running.");
