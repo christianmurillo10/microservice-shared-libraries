@@ -1,62 +1,29 @@
 version: "3.9"
 
 services:
-  boilerplate_zookeeper:
-    container_name: boilerplate_zookeeper
-    image: confluentinc/cp-zookeeper:7.6.5
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
+  zookeeper:
+    image: wurstmeister/zookeeper:latest
     ports:
       - "2181:2181"
-    volumes:
-      - local_zookeeper_data:/var/lib/zookeeper
     networks:
       - boilerplate_microservices_network
 
-  boilerplate_schema_registry:
-    container_name: boilerplate_schema_registry
-    image: confluentinc/cp-schema-registry:7.6.5
-    depends_on:
-      - boilerplate_kafka_broker
-    environment:
-      SCHEMA_REGISTRY_HOST_NAME: schema-registry
-      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: 'boilerplate_zookeeper:2181'
-      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
-      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://boilerplate_kafka_broker:9092,PLAINTEXT_INTERNAL://host.docker.internal:19092
-      SCHEMA_REGISTRY_DEBUG: 'true'
-    ports:
-      - "8081:8081"
-    volumes:
-      - local_schema_registry_data:/tmp/schema-registry
-    networks:
-      - boilerplate_microservices_network
-
-  boilerplate_kafka_broker:
-    container_name: boilerplate_kafka_broker
-    image: confluentinc/cp-kafka:7.6.5
-    depends_on:
-      - boilerplate_zookeeper
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: 'boilerplate_zookeeper:2181'
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_INTERNAL://0.0.0.0:19092
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://boilerplate_kafka_broker:9092,PLAINTEXT_INTERNAL://host.docker.internal:19092
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+  kafka:
+    image: wurstmeister/kafka:2.13-2.8.1
     ports:
       - "9092:9092"
-      - "19092:19092"
+    links:
+      - zookeeper
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: host.docker.internal
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+      KAFKA_DELETE_TOPIC_ENABLE: 'true'
     volumes:
-      - local_kafka_data:/var/lib/kafka/data
+      - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - boilerplate_microservices_network
 
 networks:
   boilerplate_microservices_network:
     driver: bridge
-
-volumes:
-  local_zookeeper_data:
-  local_schema_registry_data:
-  local_kafka_data:
