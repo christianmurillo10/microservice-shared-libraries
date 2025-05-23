@@ -1,0 +1,1596 @@
+{
+	"info": {
+		"_postman_id": "1c52903a-a870-49cf-9cbf-735c5be3ab31",
+		"name": "Microservices",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "3601495"
+	},
+	"item": [
+		{
+			"name": "Auth Service",
+			"item": [
+				{
+					"name": "/",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{auth_url}}",
+							"host": [
+								"{{auth_url}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();\r",
+									"pm.environment.set(\"auth_token\", jsonData.result.token);\r",
+									"pm.environment.set(\"refresh_token\", jsonData.result.refresh_token);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"email\": \"superadmin@email.com\",\n\t\"password\": \"password\"\n}"
+						},
+						"url": {
+							"raw": "{{auth_url}}/login",
+							"host": [
+								"{{auth_url}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{auth_url}}/logout",
+							"host": [
+								"{{auth_url}}"
+							],
+							"path": [
+								"logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"pm.environment.set(\"auth_token\", jsonData.result.token);",
+									"pm.environment.set(\"refresh_token\", jsonData.result.refresh_token);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"refresh_token\": \"{{refresh_token}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{auth_url}}/token",
+							"host": [
+								"{{auth_url}}"
+							],
+							"path": [
+								"token"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User Service",
+			"item": [
+				{
+					"name": "businesses",
+					"item": [
+						{
+							"name": "List",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{auth_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{user_url}}/businesses/",
+									"host": [
+										"{{user_url}}"
+									],
+									"path": [
+										"businesses",
+										""
+									],
+									"query": [
+										{
+											"key": "filters",
+											"value": "{\"name\": \"Business\"}",
+											"disabled": true
+										},
+										{
+											"key": "sorting",
+											"value": "{\"name\": \"asc\"}",
+											"disabled": true
+										},
+										{
+											"key": "offset",
+											"value": "0",
+											"disabled": true
+										},
+										{
+											"key": "limit",
+											"value": "10",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Read",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{auth_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{user_url}}/businesses/:id",
+									"host": [
+										"{{user_url}}"
+									],
+									"path": [
+										"businesses",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{auth_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "Business 1",
+											"type": "default"
+										},
+										{
+											"key": "domain",
+											"value": "https://domain.com",
+											"type": "default"
+										},
+										{
+											"key": "preferred_timezone",
+											"value": "Asia/Hong Kong",
+											"type": "default"
+										},
+										{
+											"key": "currency",
+											"value": "PHP",
+											"type": "default"
+										},
+										{
+											"key": "logo",
+											"type": "file",
+											"src": [],
+											"disabled": true
+										}
+									]
+								},
+								"url": {
+									"raw": "{{user_url}}/businesses",
+									"host": [
+										"{{user_url}}"
+									],
+									"path": [
+										"businesses"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete By Ids",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{auth_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"ids\": [1, 2]\n}"
+								},
+								"url": {
+									"raw": "{{user_url}}/businesses/delete-by-ids",
+									"host": [
+										"{{user_url}}"
+									],
+									"path": [
+										"businesses",
+										"delete-by-ids"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{auth_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "Business 1",
+											"type": "default"
+										},
+										{
+											"key": "api_key",
+											"value": "6222b6bd83e678f8270e9791dc4d5fcc43a089b1bdc39f93fc37e254928525b5",
+											"type": "default",
+											"disabled": true
+										},
+										{
+											"key": "domain",
+											"value": "https://domain.com",
+											"type": "default"
+										},
+										{
+											"key": "preferred_timezone",
+											"value": "Asia/Hong Kong",
+											"type": "default"
+										},
+										{
+											"key": "currency",
+											"value": "PHP",
+											"type": "default"
+										},
+										{
+											"key": "logo",
+											"type": "file",
+											"src": [],
+											"disabled": true
+										}
+									]
+								},
+								"url": {
+									"raw": "{{user_url}}/businesses/:id",
+									"host": [
+										"{{user_url}}"
+									],
+									"path": [
+										"businesses",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{auth_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{user_url}}/businesses/:id",
+									"host": [
+										"{{user_url}}"
+									],
+									"path": [
+										"businesses",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "roles",
+					"item": [
+						{
+							"name": "List",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{auth_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{user_url}}/roles/",
+									"host": [
+										"{{user_url}}"
+									],
+									"path": [
+										"roles",
+										""
+									],
+									"query": [
+										{
+											"key": "api_key",
+											"value": "{{api_key}}",
+											"disabled": true
+										},
+										{
+											"key": "filters",
+											"value": "{\"name\": \"Admin\"}",
+											"disabled": true
+										},
+										{
+											"key": "sorting",
+											"value": "{\"name\":\"asc\"}",
+											"disabled": true
+										},
+										{
+											"key": "offset",
+											"value": "0",
+											"disabled": true
+										},
+										{
+											"key": "limit",
+											"value": "10",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Read",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{auth_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{user_url}}/roles/:id",
+									"host": [
+										"{{user_url}}"
+									],
+									"path": [
+										"roles",
+										":id"
+									],
+									"query": [
+										{
+											"key": "api_key",
+											"value": "{{api_key}}",
+											"disabled": true
+										}
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{auth_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\": \"Super Administrator\",\n\t\"description\": \"Super Administrator\"\n}"
+								},
+								"url": {
+									"raw": "{{user_url}}/roles/",
+									"host": [
+										"{{user_url}}"
+									],
+									"path": [
+										"roles",
+										""
+									],
+									"query": [
+										{
+											"key": "api_key",
+											"value": "{{api_key}}",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete By Ids",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{auth_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"ids\": [1, 2]\n}"
+								},
+								"url": {
+									"raw": "{{user_url}}/roles/delete-by-ids",
+									"host": [
+										"{{user_url}}"
+									],
+									"path": [
+										"roles",
+										"delete-by-ids"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{auth_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\": \"Superadmin\",\n\t\"description\": \"Superadmin\"\n}"
+								},
+								"url": {
+									"raw": "{{user_url}}/roles/:id",
+									"host": [
+										"{{user_url}}"
+									],
+									"path": [
+										"roles",
+										":id"
+									],
+									"query": [
+										{
+											"key": "api_key",
+											"value": "{{api_key}}",
+											"disabled": true
+										}
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{auth_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{user_url}}/roles/:id",
+									"host": [
+										"{{user_url}}"
+									],
+									"path": [
+										"roles",
+										":id"
+									],
+									"query": [
+										{
+											"key": "api_key",
+											"value": "{{api_key}}",
+											"disabled": true
+										}
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "users",
+					"item": [
+						{
+							"name": "List",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{auth_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{user_url}}/users/",
+									"host": [
+										"{{user_url}}"
+									],
+									"path": [
+										"users",
+										""
+									],
+									"query": [
+										{
+											"key": "api_key",
+											"value": "{{api_key}}",
+											"disabled": true
+										},
+										{
+											"key": "filters",
+											"value": "{\"email\": \"admin\"}",
+											"disabled": true
+										},
+										{
+											"key": "sorting",
+											"value": "{\"email\":\"asc\"}",
+											"disabled": true
+										},
+										{
+											"key": "offset",
+											"value": "0",
+											"disabled": true
+										},
+										{
+											"key": "limit",
+											"value": "10",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Read",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{auth_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{user_url}}/users/:id",
+									"host": [
+										"{{user_url}}"
+									],
+									"path": [
+										"users",
+										":id"
+									],
+									"query": [
+										{
+											"key": "api_key",
+											"value": "{{api_key}}",
+											"disabled": true
+										}
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{auth_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "Superadmin",
+											"type": "default"
+										},
+										{
+											"key": "email",
+											"value": "superadmin@email.com",
+											"type": "default"
+										},
+										{
+											"key": "username",
+											"value": "superadmin",
+											"type": "default"
+										},
+										{
+											"key": "password",
+											"value": "password",
+											"type": "default"
+										},
+										{
+											"key": "access_type",
+											"value": "PORTAL",
+											"type": "text"
+										},
+										{
+											"key": "business_id",
+											"value": "null",
+											"type": "default"
+										},
+										{
+											"key": "role_id",
+											"value": "1",
+											"type": "default"
+										},
+										{
+											"key": "is_active",
+											"value": "1",
+											"type": "default",
+											"disabled": true
+										},
+										{
+											"key": "image",
+											"type": "file",
+											"src": [],
+											"disabled": true
+										}
+									]
+								},
+								"url": {
+									"raw": "{{user_url}}/users/",
+									"host": [
+										"{{user_url}}"
+									],
+									"path": [
+										"users",
+										""
+									],
+									"query": [
+										{
+											"key": "api_key",
+											"value": "{{api_key}}",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete By Ids",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{auth_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"ids\": [\"098196a8-6cb7-4eb8-b724-a183683b9cbb\"]\n}"
+								},
+								"url": {
+									"raw": "{{user_url}}/users/delete-by-ids",
+									"host": [
+										"{{user_url}}"
+									],
+									"path": [
+										"users",
+										"delete-by-ids"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{auth_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "Superadmin",
+											"type": "text"
+										},
+										{
+											"key": "email",
+											"value": "superadmin@example.com",
+											"type": "text"
+										},
+										{
+											"key": "username",
+											"value": "superadmin",
+											"type": "text"
+										},
+										{
+											"key": "access_type",
+											"value": "PORTAL",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "business_id",
+											"value": "null",
+											"type": "text"
+										},
+										{
+											"key": "role_id",
+											"value": "1",
+											"type": "text"
+										},
+										{
+											"key": "is_active",
+											"value": "1",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "image",
+											"type": "file",
+											"src": [],
+											"disabled": true
+										}
+									]
+								},
+								"url": {
+									"raw": "{{user_url}}/users/:id",
+									"host": [
+										"{{user_url}}"
+									],
+									"path": [
+										"users",
+										":id"
+									],
+									"query": [
+										{
+											"key": "api_key",
+											"value": "{{api_key}}",
+											"disabled": true
+										}
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Change Password",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{auth_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n\t\"old_password\": \"password\",\r\n\t\"new_password\": \"password1\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{user_url}}/users/change-password/:id",
+									"host": [
+										"{{user_url}}"
+									],
+									"path": [
+										"users",
+										"change-password",
+										":id"
+									],
+									"query": [
+										{
+											"key": "api_key",
+											"value": "{{api_key}}",
+											"disabled": true
+										}
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{auth_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{user_url}}/users/:id",
+									"host": [
+										"{{user_url}}"
+									],
+									"path": [
+										"users",
+										":id"
+									],
+									"query": [
+										{
+											"key": "api_key",
+											"value": "{{api_key}}",
+											"disabled": true
+										}
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "/",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{user_url}}",
+							"host": [
+								"{{user_url}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Logging Service",
+			"item": [
+				{
+					"name": "audit-trails",
+					"item": [
+						{
+							"name": "List",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{auth_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{logging_url}}/audit-trails/",
+									"host": [
+										"{{logging_url}}"
+									],
+									"path": [
+										"audit-trails",
+										""
+									],
+									"query": [
+										{
+											"key": "api_key",
+											"value": "{{api_key}}",
+											"disabled": true
+										},
+										{
+											"key": "filters",
+											"value": "{\"service_name\": \"user-service\"}",
+											"disabled": true
+										},
+										{
+											"key": "sorting",
+											"value": "{\"service_name\":\"asc\"}",
+											"disabled": true
+										},
+										{
+											"key": "offset",
+											"value": "0",
+											"disabled": true
+										},
+										{
+											"key": "limit",
+											"value": "10",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Read",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{auth_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{logging_url}}/audit-trails/:id",
+									"host": [
+										"{{logging_url}}"
+									],
+									"path": [
+										"audit-trails",
+										":id"
+									],
+									"query": [
+										{
+											"key": "api_key",
+											"value": "{{api_key}}",
+											"disabled": true
+										}
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "event-logs",
+					"item": [
+						{
+							"name": "List",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{auth_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{logging_url}}/event-logs/",
+									"host": [
+										"{{logging_url}}"
+									],
+									"path": [
+										"event-logs",
+										""
+									],
+									"query": [
+										{
+											"key": "api_key",
+											"value": "{{api_key}}",
+											"disabled": true
+										},
+										{
+											"key": "filters",
+											"value": "{\"service_name\": \"user-service\"}",
+											"disabled": true
+										},
+										{
+											"key": "sorting",
+											"value": "{\"service_name\":\"asc\"}",
+											"disabled": true
+										},
+										{
+											"key": "offset",
+											"value": "0",
+											"disabled": true
+										},
+										{
+											"key": "limit",
+											"value": "10",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Read",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{auth_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{logging_url}}/event-logs/:id",
+									"host": [
+										"{{logging_url}}"
+									],
+									"path": [
+										"event-logs",
+										":id"
+									],
+									"query": [
+										{
+											"key": "api_key",
+											"value": "{{api_key}}",
+											"disabled": true
+										}
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "user-actions",
+					"item": [
+						{
+							"name": "List",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{auth_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{logging_url}}/user-actions/",
+									"host": [
+										"{{logging_url}}"
+									],
+									"path": [
+										"user-actions",
+										""
+									],
+									"query": [
+										{
+											"key": "api_key",
+											"value": "{{api_key}}",
+											"disabled": true
+										},
+										{
+											"key": "filters",
+											"value": "{\"service_name\": \"user-service\"}",
+											"disabled": true
+										},
+										{
+											"key": "sorting",
+											"value": "{\"service_name\":\"asc\"}",
+											"disabled": true
+										},
+										{
+											"key": "offset",
+											"value": "0",
+											"disabled": true
+										},
+										{
+											"key": "limit",
+											"value": "10",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Read",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{auth_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{logging_url}}/user-actions/:id",
+									"host": [
+										"{{logging_url}}"
+									],
+									"path": [
+										"user-actions",
+										":id"
+									],
+									"query": [
+										{
+											"key": "api_key",
+											"value": "{{api_key}}",
+											"disabled": true
+										}
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "/",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{logging_url}}",
+							"host": [
+								"{{logging_url}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
